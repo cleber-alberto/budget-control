@@ -4,17 +4,19 @@ using Microsoft.Extensions.Logging;
 
 namespace BudgetControl.Application.Categories.Commands;
 
-public class CreateCategoryCommandHandler(ICategoryRepository categoryRepository, ILogger<CreateCategoryCommandHandler> logger)
-    : ICommandHandler<CreateCategoryCommand, CategoryId>
+public class CreateCategoryCommandHandler(
+    IUnitOfWork unitOfWork,
+    ICategoryRepository categoryRepository,
+    ILogger<CreateCategoryCommandHandler> logger) : ICommandHandler<CreateCategoryCommand, Guid>
 {
-    public async Task<Result<CategoryId>> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
     {
         var categoryParent = request.ParentId is not null
             ? await categoryRepository.GetByIdAsync(new CategoryId(request.ParentId.Value), cancellationToken)
             : null;
 
         var result = Category.Create(
-            request.Name,
+            request.Title,
             request.Description,
             CategoryType.FromDisplayName<CategoryType>(request.CategoryType),
             categoryParent);
@@ -22,13 +24,13 @@ public class CreateCategoryCommandHandler(ICategoryRepository categoryRepository
         if(result.IsFailure)
         {
             logger.LogError("Failed to create category: {Errors}", result.Errors);
-            return Result.Failures<CategoryId>(result.Errors);
+            return Result.Failures<Guid>(result.Errors);
         }
 
         await categoryRepository.AddAsync(result.Value, cancellationToken);
-        //await unitOfWork.CommitAsync(cancellationToken);
+        await unitOfWork.CommitAsync(cancellationToken);
 
         logger.LogInformation("Category {CategoryId} created", result.Value.Id);
-        return Result.Success(result.Value.Id);
+        return Result.Success(result.Value.Id.Value);
     }
 }

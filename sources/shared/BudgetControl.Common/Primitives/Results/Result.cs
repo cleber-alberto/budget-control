@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-
+﻿
 namespace BudgetControl.Common.Primitives.Results;
 
 public class Result

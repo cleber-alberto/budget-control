@@ -1,4 +1,7 @@
 ﻿using BudgetControl.Domain.Categories;
+using BudgetControl.Domain.ValueObjects;
+using BudgetControl.Infrastructure.Persistence.Conventers;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BudgetControl.Infrastructure.Persistence.EntityTypeConfig;
 
@@ -6,11 +9,42 @@ internal sealed class CategoryEntityTypeConfig : IEntityTypeConfiguration<Catego
 {
     public void Configure(EntityTypeBuilder<Category> builder)
     {
+
+        var idConverter = new ValueConverter<CategoryId, Guid>(
+            v => v.Value,
+            v => new CategoryId(v)
+        );
+
+        var categoryTypeConverter = new ValueConverter<CategoryType, int>(
+            v => v.Id,
+            v => CategoryType.FromValue<CategoryType>(v)
+        );
+
         builder.HasKey(x => x.Id);
-        builder.Property(x => x.Name).HasMaxLength(100).IsRequired();
-        builder.Property(x => x.Description).HasMaxLength(500);
-        builder.Property(x => x.Type).IsRequired();
-        builder.HasOne<Category>().WithMany().HasForeignKey(x => x.Parent!.Id);
+        builder.Property(x => x.Id)
+            .HasConversion(idConverter)
+            .ValueGeneratedOnAdd();
+        builder.Property(x => x.Title)
+            .HasConversion(ValueObjectConverter.TitleConverter)
+            .HasMaxLength(64)
+            .IsRequired();
+        builder.Property(x => x.Description)
+            .HasConversion(ValueObjectConverter.DescriptionConverter)
+            .HasMaxLength(1024)
+            .IsRequired();
+        builder.Property(x => x.Type)
+            .HasConversion(categoryTypeConverter)
+            .IsRequired();
+
+        // builder.OwnsOne(x => x.Parent, p =>
+        // {
+        //     p.Property(x => x.Id)
+        //         .HasConversion(idConverter)
+        //         .HasColumnName("ParentId");
+        //     p.WithOwner().HasForeignKey("ParentId");
+        // });
+
+        //builder.HasOne<Category>().WithMany().HasForeignKey(x => x.ParentId);
 
         // builder.HasData(
         //     new Category
