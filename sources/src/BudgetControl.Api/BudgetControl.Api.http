@@ -1,0 +1,17 @@
+@baseUrl = https://localhost:7035
+@id = "{{$guid}}"
+// random string
+
+POST {{baseUrl}}/categories
+Accept: application/json
+X-Api-Version: 1
+Content-Type: application/json
+
+{
+  "name": "Salary",
+  "description": "Salary",
+  "categoryType": "Income",
+  "parentId": null
+}
+
+###

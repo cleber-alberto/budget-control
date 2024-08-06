@@ -1,0 +1,12 @@
+/Users/cleber-alberto/Solutions/dotnet/budget-control/sources/shared/BudgetControl.Common/bin/Debug/net8.0/BudgetControl.Common.deps.json
+/Users/cleber-alberto/Solutions/dotnet/budget-control/sources/shared/BudgetControl.Common/bin/Debug/net8.0/BudgetControl.Common.dll
+/Users/cleber-alberto/Solutions/dotnet/budget-control/sources/shared/BudgetControl.Common/bin/Debug/net8.0/BudgetControl.Common.pdb
+/Users/cleber-alberto/Solutions/dotnet/budget-control/sources/shared/BudgetControl.Common/obj/Debug/net8.0/BudgetControl.Common.csproj.AssemblyReference.cache
+/Users/cleber-alberto/Solutions/dotnet/budget-control/sources/shared/BudgetControl.Common/obj/Debug/net8.0/BudgetControl.Common.GeneratedMSBuildEditorConfig.editorconfig
+/Users/cleber-alberto/Solutions/dotnet/budget-control/sources/shared/BudgetControl.Common/obj/Debug/net8.0/BudgetControl.Common.AssemblyInfoInputs.cache
+/Users/cleber-alberto/Solutions/dotnet/budget-control/sources/shared/BudgetControl.Common/obj/Debug/net8.0/BudgetControl.Common.AssemblyInfo.cs
+/Users/cleber-alberto/Solutions/dotnet/budget-control/sources/shared/BudgetControl.Common/obj/Debug/net8.0/BudgetControl.Common.csproj.CoreCompileInputs.cache
+/Users/cleber-alberto/Solutions/dotnet/budget-control/sources/shared/BudgetControl.Common/obj/Debug/net8.0/BudgetControl.Common.dll
+/Users/cleber-alberto/Solutions/dotnet/budget-control/sources/shared/BudgetControl.Common/obj/Debug/net8.0/refint/BudgetControl.Common.dll
+/Users/cleber-alberto/Solutions/dotnet/budget-control/sources/shared/BudgetControl.Common/obj/Debug/net8.0/BudgetControl.Common.pdb
+/Users/cleber-alberto/Solutions/dotnet/budget-control/sources/shared/BudgetControl.Common/obj/Debug/net8.0/ref/BudgetControl.Common.dll

@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "W+32Gr63TzD9lJsrNjCycLC8Iq0bXVvEC+ffCqE2LlQ=",
+  "Source": "BudgetControl.Api",
+  "BasePath": "_content/BudgetControl.Api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
