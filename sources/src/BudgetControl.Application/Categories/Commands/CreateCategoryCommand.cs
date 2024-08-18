@@ -3,7 +3,7 @@
 namespace BudgetControl.Application.Categories.Commands;
 
 public record CreateCategoryCommand(
-    string Name,
+    string Title,
     string Description,
     string CategoryType,
-    Guid? ParentId) : ICommand<CategoryId>;
+    Guid? ParentId) : ICommand<Guid>;

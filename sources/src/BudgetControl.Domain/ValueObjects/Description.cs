@@ -1,10 +1,11 @@
 ﻿
 namespace BudgetControl.Domain.ValueObjects;
 
-public sealed class Description(string value) : ValueObject
+public sealed class Description(string Value) : ValueObject
 {
-    const string Name = "description";
     const int MaxLength = 1024;
+
+    public string Value { get; } = Value;
 
     public static Result<Description> Create(string value)
     {
@@ -12,12 +13,12 @@ public sealed class Description(string value) : ValueObject
 
         if (string.IsNullOrWhiteSpace(value))
         {
-            erros.Add(Error.NullOrWhiteSpace(Name));
+            erros.Add(Error.NullOrWhiteSpace(nameof(Description)));
         }
 
         if (value.Length > MaxLength)
         {
-            erros.Add(Error.TooLong(Name, MaxLength));
+            erros.Add(Error.TooLong(nameof(Description), MaxLength));
         }
 
         return erros.Count != 0
@@ -27,6 +28,6 @@ public sealed class Description(string value) : ValueObject
 
     public override IEnumerable<object> GetAtomicValues()
     {
-        yield return value;
+        yield return Value;
     }
 }

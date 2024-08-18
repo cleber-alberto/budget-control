@@ -6,23 +6,24 @@ namespace BudgetControl.Domain.Categories;
 public class Category : Entity, IEquatable<Category>
 {
     public CategoryId Id { get; private set; } = null!;
-    public Name Name { get; private set; } = null!;
+    public Title Title { get; private set; } = null!;
     public Description Description { get; private set; } = null!;
     public Category? Parent { get; private set; }
     public CategoryType Type { get; private set; } = null!;
 
-    public Result Update(string name, string description,  CategoryType type, Category? parent)
+    public Result Update(string title, string description,  CategoryType type, Category? parent)
     {
-        var nameResult = Name.Create(name);
+        var tileResult = Title.Create(title);
         var descriptionResult = Description.Create(description);
-        var result = Result.Combine(nameResult, descriptionResult);
+        var result = Result.Combine(tileResult, descriptionResult);
 
         if(result.IsFailure)
         {
             return Result<Category>.Failures(result.Errors);
         }
 
-        Name = nameResult.Value;
+        Title = tileResult.Value;
+        Description = descriptionResult.Value;
         Type = type;
         Parent = parent;
 
@@ -49,5 +50,5 @@ public class Category : Entity, IEquatable<Category>
         return Id.Equals(other.Id);
     }
 
-    public static int GetHashCode([DisallowNull] Category obj) => HashCode.Combine(obj.Id, obj.Name, obj.Type, obj.Parent);
+    public static int GetHashCode([DisallowNull] Category obj) => HashCode.Combine(obj.Id, obj.Title, obj.Type, obj.Parent);
 }

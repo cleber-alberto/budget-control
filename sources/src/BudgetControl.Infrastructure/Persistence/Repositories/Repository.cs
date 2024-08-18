@@ -4,12 +4,12 @@ using BudgetControl.Common.Primitives.Persistence;
 
 namespace BudgetControl.Infrastructure.Persistence.Repositories;
 
-public class Repository<TEntity, TId>(DbContext dbContext) : IRepository<TEntity, TId>
+public class Repository<TEntity, TId>(IDbContext dbContext) : IRepository<TEntity, TId>
     where TEntity : Entity
     where TId : StronglyTypeId<Guid>
 {
     public Task<TEntity?> GetByIdAsync(TId id, CancellationToken cancellationToken) =>
-         dbContext.Set<TEntity>().FindAsync([id.Value], cancellationToken).AsTask();
+         dbContext.Set<TEntity>().FindAsync([id], cancellationToken).AsTask();
 
     public Task<TEntity?> GetByExpressionAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken) =>
         dbContext.Set<TEntity>().FirstOrDefaultAsync(predicate, cancellationToken);
