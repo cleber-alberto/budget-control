@@ -10,7 +10,7 @@ public class BudgedControlContextFactory : IDesignTimeDbContextFactory<BudgetCon
     public BudgetControlDbContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<BudgetControlDbContext>();
-        optionsBuilder.UseSqlServer("Data Source=127.0.0.1;Initial Catalog=BudgetControl;TrustServerCertificate=True;MultipleActiveResultSets=true;User ID=sa;Password=~Fn8ScPVbRVrU6eZD2.Rez");
+        optionsBuilder.UseSqlServer("Data Source=127.0.0.1;Initial Catalog=BudgetControlDb;TrustServerCertificate=True;MultipleActiveResultSets=true;User ID=sa;Password=~Fn8ScPVbRVrU6eZD2.Rez");
 
         return new BudgetControlDbContext(optionsBuilder.Options);
     }

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BudgetControl.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(BudgetControlDbContext))]
-    [Migration("20240811124620_InitialCreate")]
+    [Migration("20240820035323_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -35,6 +35,9 @@ namespace BudgetControl.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(1024)
                         .HasColumnType("nvarchar(1024)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<Guid?>("ParentId")
                         .HasColumnType("uniqueidentifier");

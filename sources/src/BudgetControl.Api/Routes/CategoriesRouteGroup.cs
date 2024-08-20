@@ -5,7 +5,6 @@ using BudgetControl.Common.Primitives.Results;
 using BudgetControl.Domain.Categories;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Server.HttpSys;
 using Microsoft.EntityFrameworkCore;
 
 namespace BudgetControl.Api.Routes;
@@ -15,14 +14,33 @@ public static class CategoriesRouteGroup
 
     public static RouteGroupBuilder MapCategoriesRoutes(this RouteGroupBuilder group)
     {
-        //group.MapGet("/", () => new { Id = 1, Name = "Category 1" }).WithName("Get all categories");
+        group.MapGet("/", GetAll()).WithName("Get all categories");
         group.MapGet("/{id:guid}", Find()).WithName("Find category by id");
         group.MapPost("/", Create()).WithName("Create category");
         group.MapPut("/{id:guid}", Update()).WithName("Update category");
         // group.MapPatch("/{id:guid}", (Guid id) => new { Id = 1, Name = "Category 1" }).WithName("Patch category");
-        // group.MapDelete("/{id:guid}", (Guid id) => new { Id = 1, Name = "Category 1" }).WithName("Delete category");
+        group.MapDelete("/{id:guid}", Delete()).WithName("Delete category");
 
         return group;
+    }
+
+    private static Func<ISender, CancellationToken, Task<IResult>> GetAll()
+    {
+        return async (ISender sender, CancellationToken cancellationToken) =>
+        {
+            try
+            {
+                var result = await sender.Send(new GetAllCategoriesQuery(), cancellationToken);
+
+                return result.IsSuccess
+                    ? Results.Ok(result.Value)
+                    : Results.NotFound();
+            }
+            catch (Exception ex)
+            {
+                return Problem(ex);
+            }
+        };
     }
 
     private static Func<Guid, ISender, CancellationToken, Task<IResult>> Find()
@@ -72,7 +90,26 @@ public static class CategoriesRouteGroup
 
                 return result.IsSuccess
                     ? Results.NoContent()
-                    : result.Errors.Contains(Error.NotFound)
+                    : result.Errors.Contains(Error.NotFound())
+                        ? Results.NotFound(result.Errors)
+                        : Results.BadRequest(result.Errors);
+            }
+            catch (Exception ex)
+            {
+                return Problem(ex);
+            }
+        };
+
+    private static Func<Guid, ISender, CancellationToken, Task<IResult>> Delete() =>
+        async (Guid id, ISender sender, CancellationToken cancellationToken) =>
+        {
+            try
+            {
+                var result = await sender.Send(new DeleteCategoryCommand(id), cancellationToken);
+
+                return result.IsSuccess
+                    ? Results.NoContent()
+                    : result.Errors.Contains(Error.NotFound())
                         ? Results.NotFound(result.Errors)
                         : Results.BadRequest(result.Errors);
             }

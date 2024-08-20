@@ -6,6 +6,7 @@ public interface IRepository<TEntity, TId>
     where TEntity : Entity
     where TId : StronglyTypeId<Guid>
 {
+    IAsyncEnumerable<TEntity> GetAllAsync(CancellationToken cancellationToken = default);
     Task<TEntity?> GetByIdAsync(TId id, CancellationToken cancellationToken = default);
     Task<TEntity?> GetByExpressionAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default);
     Task AddAsync(TEntity entity, CancellationToken cancellationToken = default);

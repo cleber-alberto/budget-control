@@ -13,13 +13,13 @@ public class FindCategoryQueryHandler(
         if (category == null)
         {
             logger.LogWarning("Category with id {Id} was not found", request.CategoryId);
-            return Result<CategoryResponse>.Failures([Error.NotFound]);
+            return Result<CategoryResponse>.Failures([Error.NotFound()]);
         }
 
         var categoryDto = new CategoryResponse(
             category.Title.Value,
             category.Description.Value,
-            category.Parent?.Id.Value);
+            category.CategoryType.Name);
 
         return Result.Success(categoryDto);
     }

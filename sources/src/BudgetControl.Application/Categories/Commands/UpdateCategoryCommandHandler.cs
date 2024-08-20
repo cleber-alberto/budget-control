@@ -15,36 +15,63 @@ public class UpdateCategoryCommandHandler(
         if (category == null)
         {
             logger.LogWarning("Category with id {Id} was not found", request.Id);
-            return Result.Failures([Error.NotFound]);
+            return Result.Failures([Error.NotFound()]);
         }
 
-        Category? categoryParent = null;
-        if (request.ParentId is not null)
-        {
-            categoryParent = await categoryRepository.GetByIdAsync(new CategoryId(request.ParentId.Value), cancellationToken);
-            if (categoryParent == null)
-            {
-                logger.LogWarning("Parent category with id {Id} was not found", request.ParentId);
-                return Result.Failures([Error.NotFound]);
-            }
-        }
-
-        var result = category.Update(
+        var resultCategory = category.Update(
+            new CategoryId(request.Id),
             request.Title,
             request.Description,
-            CategoryType.FromDisplayName<CategoryType>(request.CategoryType),
-            categoryParent);
+            CategoryType.FromDisplayName<CategoryType>(request.CategoryType));
 
-        if (result.IsFailure)
+        if (resultCategory.IsFailure)
         {
-            logger.LogError("Failed to update category: {Errors}", result.Errors);
-            return Result.Failures(result.Errors);
+            logger.LogError("Failed to update category: {Errors}", resultCategory.Errors);
+            return Result.Failures(resultCategory.Errors);
+        }
+
+        var resultSubcategory = UpdateSubcategories(category, request);
+
+        if(resultSubcategory.IsFailure)
+        {
+            return Result.Failures(resultSubcategory.Errors);
         }
 
         categoryRepository.Update(category);
         await unitOfWork.CommitAsync(cancellationToken);
 
         logger.LogInformation("Category {CategoryId} updated", category.Id);
+        return Result.Success(true);
+    }
+
+    private Result UpdateSubcategories(Category category, UpdateCategoryCommand request)
+    {
+        foreach (var subcategory in request.Subcategories)
+        {
+            Result<Subcategory> subcategoryResult = null!;
+            var subcategoryFound = category.Subcategories.FirstOrDefault(x => x.Title.Value.Equals(subcategory.Title, StringComparison.OrdinalIgnoreCase));
+
+            if (subcategoryFound == null)
+            {
+                subcategoryResult = category.CreateSubcategory(
+                    subcategory.Title,
+                    subcategory.Description);
+            }
+            else
+            {
+                subcategoryResult = category.UpdateSubcategory(
+                    new SubcategoryId(subcategory.Id),
+                    subcategory.Title,
+                    subcategory.Description);
+            }
+
+            if (subcategoryResult.IsFailure)
+            {
+                logger.LogError("Failed to update subcategory: {Errors}", subcategoryResult.Errors);
+                return Result.Failures(subcategoryResult.Errors);
+            }
+        }
+
         return Result.Success(true);
     }
 }

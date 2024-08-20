@@ -1,4 +1,5 @@
-﻿using BudgetControl.Domain.Categories;
+﻿using System.Security.Cryptography.X509Certificates;
+using BudgetControl.Domain.Categories;
 using BudgetControl.Domain.ValueObjects;
 using BudgetControl.Infrastructure.Persistence.Conventers;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -32,19 +33,20 @@ internal sealed class CategoryEntityTypeConfig : IEntityTypeConfiguration<Catego
             .HasConversion(ValueObjectConverter.DescriptionConverter)
             .HasMaxLength(1024)
             .IsRequired();
-        builder.Property(x => x.Type)
+        builder.Property(x => x.CategoryType)
             .HasConversion(categoryTypeConverter)
             .IsRequired();
+        builder.Property(x => x.IsDeleted)
+            .IsRequired();
 
-        // builder.OwnsOne(x => x.Parent, p =>
-        // {
-        //     p.Property(x => x.Id)
-        //         .HasConversion(idConverter)
-        //         .HasColumnName("ParentId");
-        //     p.WithOwner().HasForeignKey("ParentId");
-        // });
+        // builder.HasOne(x => x.Parent)
+        //     .WithMany()
+        //     .HasForeignKey("ParentId")
+        //     .IsRequired(false)
+        //     .OnDelete(DeleteBehavior.Restrict);
 
-        //builder.HasOne<Category>().WithMany().HasForeignKey(x => x.ParentId);
+        // builder.Navigation(x => x.Parent)
+        //     .UsePropertyAccessMode(PropertyAccessMode.Property);
 
         // builder.HasData(
         //     new Category
@@ -62,6 +64,8 @@ internal sealed class CategoryEntityTypeConfig : IEntityTypeConfiguration<Catego
         //         Type = CategoryType.Expense
         //     }
         // );
+
+        builder.HasQueryFilter(x => !x.IsDeleted);
 
         builder.ToTable("Categories");
     }

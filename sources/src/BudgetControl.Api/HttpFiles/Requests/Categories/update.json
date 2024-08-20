@@ -1,0 +1,19 @@
+{
+    "title": "Incomes",
+    "description": "Money earned or received regularly",
+    "categoryType": "Credit",
+    "subcategories": [
+      {
+        "title": "Salary",
+        "description": "Salary income"
+      },
+      {
+        "title": "Bonus",
+        "description": "Bonus income"
+      },
+      {
+        "title": "Investment",
+        "description": "Income from investments"
+      }
+    ]
+  }

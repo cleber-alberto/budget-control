@@ -8,6 +8,9 @@ public class Repository<TEntity, TId>(IDbContext dbContext) : IRepository<TEntit
     where TEntity : Entity
     where TId : StronglyTypeId<Guid>
 {
+    public IAsyncEnumerable<TEntity> GetAllAsync(CancellationToken cancellationToken) =>
+        dbContext.Set<TEntity>().AsAsyncEnumerable();
+
     public Task<TEntity?> GetByIdAsync(TId id, CancellationToken cancellationToken) =>
          dbContext.Set<TEntity>().FindAsync([id], cancellationToken).AsTask();
 

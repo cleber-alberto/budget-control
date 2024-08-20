@@ -1,5 +1,4 @@
-﻿using BudgetControl.Application.Categories.Commands;
-using BudgetControl.Domain.Categories;
+﻿using BudgetControl.Domain.Categories;
 using Microsoft.Extensions.Logging;
 
 namespace BudgetControl.Application.Categories.Commands;
@@ -11,26 +10,50 @@ public class CreateCategoryCommandHandler(
 {
     public async Task<Result<Guid>> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
     {
-        var categoryParent = request.ParentId is not null
-            ? await categoryRepository.GetByIdAsync(new CategoryId(request.ParentId.Value), cancellationToken)
-            : null;
-
-        var result = Category.Create(
+        var categoryResult = Category.Create(
             request.Title,
             request.Description,
-            CategoryType.FromDisplayName<CategoryType>(request.CategoryType),
-            categoryParent);
+            CategoryType.FromDisplayName<CategoryType>(request.CategoryType));
 
-        if(result.IsFailure)
+        if (categoryResult.IsFailure)
         {
-            logger.LogError("Failed to create category: {Errors}", result.Errors);
-            return Result.Failures<Guid>(result.Errors);
+            logger.LogError("Failed to create category: {Errors}", categoryResult.Errors);
+            return Result.Failures<Guid>(categoryResult.Errors);
         }
 
-        await categoryRepository.AddAsync(result.Value, cancellationToken);
+        if (request.Subcategories is not null && request.Subcategories.Any())
+        {
+            var resultSubcategory = CreateSubcategories(categoryResult.Value, request);
+            if (resultSubcategory.IsFailure)
+            {
+                return Result.Failures<Guid>(resultSubcategory.Errors);
+            }
+        }
+
+        await categoryRepository.AddAsync(categoryResult.Value, cancellationToken);
         await unitOfWork.CommitAsync(cancellationToken);
 
-        logger.LogInformation("Category {CategoryId} created", result.Value.Id);
-        return Result.Success(result.Value.Id.Value);
+        logger.LogInformation("Category {CategoryId} created", categoryResult.Value.Id);
+        return Result.Success(categoryResult.Value.Id.Value);
+    }
+
+    private Result CreateSubcategories(Category category, CreateCategoryCommand request)
+    {
+        Result subcategoryResult = null!;
+
+        foreach (var subcategory in request.Subcategories)
+        {
+            subcategoryResult = category.CreateSubcategory(subcategory.Title, subcategory.Description);
+
+            if (subcategoryResult.IsFailure)
+            {
+                logger.LogError("Failed to create subcategory: {Errors}", subcategoryResult.Errors);
+                return Result.Failures(subcategoryResult.Errors);
+            }
+        }
+
+        return subcategoryResult.IsFailure
+            ? Result.Failures(subcategoryResult.Errors)
+            : Result.Success(true);
     }
 }

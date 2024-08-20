@@ -1,43 +1,73 @@
-﻿
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace BudgetControl.Domain.Categories;
 
 public class Category : Entity, IEquatable<Category>
 {
-    public CategoryId Id { get; private set; } = null!;
+    public CategoryId Id { get; protected set; } = null!;
     public Title Title { get; private set; } = null!;
     public Description Description { get; private set; } = null!;
-    public Category? Parent { get; private set; }
-    public CategoryType Type { get; private set; } = null!;
+    public CategoryType CategoryType { get; private set; } = null!;
+    public ICollection<Subcategory> Subcategories { get; private set; } = [];
 
-    public Result Update(string title, string description,  CategoryType type, Category? parent)
+    public static Result<Category> Create(string title, string description, CategoryType categoryType)
     {
-        var tileResult = Title.Create(title);
-        var descriptionResult = Description.Create(description);
-        var result = Result.Combine(tileResult, descriptionResult);
+        var category = new Category();
+        var result = category.Update(new CategoryId(Guid.NewGuid()), title, description, categoryType);
 
+        if (result.IsFailure)
+        {
+            return Result.Failures<Category>(result.Errors);
+        }
+
+        return Result.Success(result.Value);
+    }
+
+    public Result<Category> Update(CategoryId categoryId, string title, string description,  CategoryType categoryType)
+    {
+        var titleResult = Title.Create(title);
+        var descriptionResult = Description.Create(description);
+
+        var result = Result.Combine(titleResult, descriptionResult);
         if(result.IsFailure)
         {
             return Result<Category>.Failures(result.Errors);
         }
 
-        Title = tileResult.Value;
+        Id = categoryId;
+        Title = titleResult.Value;
         Description = descriptionResult.Value;
-        Type = type;
-        Parent = parent;
+        CategoryType = categoryType;
 
         return Result<Category>.Success(this);
     }
 
-    public static Result<Category> Create(string name, string description, CategoryType type, Category? parent)
+    public Result<Subcategory> CreateSubcategory(string title, string description)
     {
-        var category = new Category();
-        var result = category.Update(name, description, type, parent);
+        return UpdateSubcategory(new SubcategoryId(Guid.NewGuid()), title, description);
+    }
 
-        return result.IsSuccess
-            ? Result.Success(category)
-            : Result.Failures<Category>(result.Errors);
+    public Result<Subcategory> UpdateSubcategory(SubcategoryId id, string title, string description)
+    {
+        Result<Subcategory> subcategoryResult = null!;
+        var subcategory = Subcategories.FirstOrDefault(x => x.Id.Equals(id));
+
+        if (subcategory is null)
+        {
+            subcategoryResult = Subcategory.Create(title, description, this);
+            if (subcategoryResult.IsSuccess)
+            {
+                Subcategories.Add(subcategoryResult.Value);
+            }
+        }
+        else
+        {
+            subcategoryResult = subcategory.Update(title, description);
+        }
+
+        return subcategoryResult.IsFailure
+            ? Result<Subcategory>.Failures(subcategoryResult.Errors)
+            : Result<Subcategory>.Success(subcategoryResult.Value);
     }
 
     public override string ToString() => $"{GetType().Name}({Id})";
@@ -50,5 +80,5 @@ public class Category : Entity, IEquatable<Category>
         return Id.Equals(other.Id);
     }
 
-    public static int GetHashCode([DisallowNull] Category obj) => HashCode.Combine(obj.Id, obj.Title, obj.Type, obj.Parent);
+    public static int GetHashCode([DisallowNull] Category obj) => HashCode.Combine(obj.Id, obj.Title, obj.CategoryType);
 }

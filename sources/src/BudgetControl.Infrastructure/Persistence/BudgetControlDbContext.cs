@@ -8,6 +8,7 @@ public class BudgetControlDbContext(DbContextOptions<BudgetControlDbContext> opt
     : DbContext(options), IDbContext
 {
     public DbSet<Category> Categories { get; set; }
+    public DbSet<Subcategory> Subcategories { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

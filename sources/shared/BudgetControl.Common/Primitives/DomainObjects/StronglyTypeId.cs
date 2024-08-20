@@ -27,5 +27,5 @@ public abstract class StronglyTypeId<TValue>(TValue value) : IComparable<Strongl
 
     public override int GetHashCode() => Value.GetHashCode();
 
-    public override string ToString() => Value.ToString();
+    public override string ToString() => Value.ToString()!;
 }
