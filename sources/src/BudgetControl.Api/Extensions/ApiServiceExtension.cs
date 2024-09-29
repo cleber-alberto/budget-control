@@ -3,8 +3,6 @@ using BudgetControl.Api.Routes;
 using BudgetControl.Application.Extensions;
 using BudgetControl.Infrastructure.Extensions;
 using BudgetControl.Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
-using Scrutor;
 
 namespace BudgetControl.Api.Extensions;
 
@@ -21,23 +19,6 @@ public static class ApiServiceExtension
         services
             .AddApplicationServices()
             .AddInfrastructureServices(configuration);
-
-        services.AddDbContext<DbContext, BudgetControlDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("BudgetControlConnection")));
-
-        services.Scan(scan => scan
-            .FromAssemblies(typeof(InfrastructureServiceExtension).Assembly)
-            .AddClasses(classes => classes.Where(type => type.Name.EndsWith("Repository")))
-            .UsingRegistrationStrategy(RegistrationStrategy.Throw)
-            .AsMatchingInterface()
-            .WithScopedLifetime());
-
-        // logger
-        services.Scan(scan => scan
-            .FromAssemblies(typeof(ApiServiceExtension).Assembly)
-            .AddClasses(classes => classes.Where(type => type.Name.EndsWith("Logger")))
-            .UsingRegistrationStrategy(RegistrationStrategy.Throw)
-            .AsImplementedInterfaces()
-            .WithScopedLifetime());
 
         services.AddApiVersioning(options => {
             options.DefaultApiVersion = new ApiVersion(1, 0);

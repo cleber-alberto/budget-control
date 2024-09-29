@@ -25,7 +25,11 @@ public abstract class StronglyTypeId<TValue>(TValue value) : IComparable<Strongl
         return false;
     }
 
+    public static bool operator ==(StronglyTypeId<TValue> left, StronglyTypeId<TValue> right) => left.Equals(right);
+
+    public static bool operator !=(StronglyTypeId<TValue> left, StronglyTypeId<TValue> right) => !left.Equals(right);
+
     public override int GetHashCode() => Value.GetHashCode();
 
-    public override string ToString() => Value.ToString();
+    public override string ToString() => Value.ToString()!;
 }

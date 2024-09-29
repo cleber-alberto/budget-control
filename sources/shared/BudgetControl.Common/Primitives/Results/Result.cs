@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-
+﻿
 namespace BudgetControl.Common.Primitives.Results;
 
 public class Result
@@ -20,11 +19,9 @@ public class Result
         Errors = errors;
     }
 
-    public static Result<TValue> Success<TValue>(TValue value) =>
-        new(true, Enumerable.Empty<Error>(), value);
+    public static Result<TValue> Success<TValue>(TValue value) => new(true, [], value);
 
-    private static Result Success() =>
-        new(true, Enumerable.Empty<Error>());
+    private static Result Success() => new(true, []);
 
     public static Result<TValue> Create<TValue>(TValue value, IEnumerable<Error> errors) where TValue : class =>
         value is null ? Failures<TValue>(errors) : Success(value);
