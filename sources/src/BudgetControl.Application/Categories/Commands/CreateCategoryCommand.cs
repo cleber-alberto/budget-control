@@ -1,9 +1,8 @@
-﻿using BudgetControl.Domain.Categories;
-
+﻿
 namespace BudgetControl.Application.Categories.Commands;
 
+[ExcludeFromCodeCoverage]
 public record CreateCategoryCommand(
-    string Name,
+    string Title,
     string Description,
-    string CategoryType,
-    Guid? ParentId) : ICommand<CategoryId>;
+    string Type) : ICommand<Guid>;

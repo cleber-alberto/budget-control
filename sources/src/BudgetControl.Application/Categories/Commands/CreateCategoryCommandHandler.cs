@@ -1,34 +1,36 @@
-﻿using BudgetControl.Application.Categories.Commands;
-using BudgetControl.Domain.Categories;
+﻿using BudgetControl.Domain.Categories;
 using Microsoft.Extensions.Logging;
 
 namespace BudgetControl.Application.Categories.Commands;
 
-public class CreateCategoryCommandHandler(ICategoryRepository categoryRepository, ILogger<CreateCategoryCommandHandler> logger)
-    : ICommandHandler<CreateCategoryCommand, CategoryId>
+public class CreateCategoryCommandHandler(
+    IUnitOfWork unitOfWork,
+    ICategoryRepository categoryRepository,
+    ILogger<CreateCategoryCommandHandler> logger) : ICommandHandler<CreateCategoryCommand, Guid>
 {
-    public async Task<Result<CategoryId>> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
     {
-        var categoryParent = request.ParentId is not null
-            ? await categoryRepository.GetByIdAsync(new CategoryId(request.ParentId.Value), cancellationToken)
-            : null;
-
-        var result = Category.Create(
-            request.Name,
+        var categoryResult = Category.Create(
+            request.Title,
             request.Description,
-            CategoryType.FromDisplayName<CategoryType>(request.CategoryType),
-            categoryParent);
+            request.Type);
 
-        if(result.IsFailure)
+        if (categoryResult.IsFailure)
         {
-            logger.LogError("Failed to create category: {Errors}", result.Errors);
-            return Result.Failures<CategoryId>(result.Errors);
+            logger.LogError("Failed to create category: {Errors}", categoryResult.Errors);
+            return Result.Failures<Guid>(categoryResult.Errors);
         }
 
-        await categoryRepository.AddAsync(result.Value, cancellationToken);
-        //await unitOfWork.CommitAsync(cancellationToken);
+        await categoryRepository.AddAsync(categoryResult.Value, cancellationToken);
 
-        logger.LogInformation("Category {CategoryId} created", result.Value.Id);
-        return Result.Success(result.Value.Id);
+        var resultDatabase = await unitOfWork.CommitAsync(cancellationToken);
+        if (resultDatabase.IsFailure)
+        {
+            logger.LogCritical("Failed to commit changes: {Errors}", resultDatabase.Errors);
+            return Result.Failures<Guid>(resultDatabase.Errors);
+        }
+
+        logger.LogInformation("Category {CategoryId} created", categoryResult.Value.Id);
+        return Result.Success(categoryResult.Value.Id.Value);
     }
 }

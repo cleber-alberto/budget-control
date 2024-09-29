@@ -4,22 +4,29 @@ using BudgetControl.Common.Primitives.Persistence;
 
 namespace BudgetControl.Infrastructure.Persistence.Repositories;
 
-public class Repository<TEntity, TId>(DbContext dbContext) : IRepository<TEntity, TId>
-    where TEntity : Entity
+public class Repository<TEntity, TId>(IDbContext dbContext) : IRepository<TEntity, TId>
+    where TEntity : Entity, IAggregateRoot
     where TId : StronglyTypeId<Guid>
 {
+    public IAsyncEnumerable<TEntity> GetAllAsync(CancellationToken cancellationToken) =>
+        dbContext.Set<TEntity>().AsAsyncEnumerable();
+
     public Task<TEntity?> GetByIdAsync(TId id, CancellationToken cancellationToken) =>
-         dbContext.Set<TEntity>().FindAsync([id.Value], cancellationToken).AsTask();
+         dbContext.Set<TEntity>().FindAsync([id], cancellationToken).AsTask();
 
     public Task<TEntity?> GetByExpressionAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken) =>
         dbContext.Set<TEntity>().FirstOrDefaultAsync(predicate, cancellationToken);
 
-    public async Task AddAsync(TEntity entity, CancellationToken cancellationToken) =>
+    public async Task AddAsync(TEntity entity, CancellationToken cancellationToken)
+    {
         await dbContext.Set<TEntity>().AddAsync(entity, cancellationToken);
+    }
 
     public void Delete(TEntity entity) =>
         dbContext.Set<TEntity>().Remove(entity);
 
-    public void Update(TEntity entity) =>
+    public void Update(TEntity entity)
+    {
         dbContext.Set<TEntity>().Update(entity);
+    }
 }

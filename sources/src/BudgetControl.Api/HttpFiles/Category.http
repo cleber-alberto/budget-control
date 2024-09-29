@@ -1,0 +1,41 @@
+@baseUrl = https://localhost:7035
+
+# @name createCategory
+POST {{baseUrl}}/categories
+Accept: application/json
+X-Api-Version: 1
+Content-Type: application/json
+
+<@ ./Requests/Categories/create.json
+
+###
+
+@categoryId = {{createCategory.response.body.id}}
+
+###
+
+# @name getCategory
+GET {{baseUrl}}/categories/{{categoryId}}
+Accept: application/json
+X-Api-Version: 1
+Content-Type: application/json
+
+
+###
+# @name putCategory
+PUT {{baseUrl}}/categories/{{categoryId}}
+Accept: application/json
+X-Api-Version: 1
+Content-Type: application/json
+
+<@ ./Requests/Categories/update.json
+
+###
+
+# @name deleteCategory
+DELETE {{baseUrl}}/categories/{{categoryId}}
+Accept: application/json
+X-Api-Version: 1
+Content-Type: application/json
+
+###

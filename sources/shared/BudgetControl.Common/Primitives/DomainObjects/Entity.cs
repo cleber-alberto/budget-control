@@ -1,7 +1,11 @@
 ﻿namespace BudgetControl.Common.Primitives.DomainObjects;
 
-public abstract class Entity : ICloneable
+public abstract class Entity : Auditory, ICloneable
 {
+    public bool IsDeleted { get; protected set; }
+
+    public void SetDeleted() => this.IsDeleted = true;
+
     public override bool Equals(object? obj)
     {
         if (obj is null) return false;

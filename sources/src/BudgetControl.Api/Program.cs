@@ -6,7 +6,7 @@ using BudgetControl.Infrastructure.Persistence;
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
-builder.AddSqlServerDbContext<BudgetControlDbContext>("BudgetControlConnection", static settings => {
+builder.AddSqlServerDbContext<BudgetControlDbContext>("DefaultConnection", static settings => {
         settings.DisableHealthChecks = true;
         settings.DisableRetry = true;
         settings.DisableTracing = true;
