@@ -1,0 +1,15 @@
+{
+  "title": "Incomes",
+  "description": "Money earned or received",
+  "categoryType": "Credit",
+  "subcategories": [
+    {
+      "title": "Salary",
+      "description": "Salary income"
+    },
+    {
+      "title": "Bonus",
+      "description": "Bonus income"
+    }
+  ]
+}

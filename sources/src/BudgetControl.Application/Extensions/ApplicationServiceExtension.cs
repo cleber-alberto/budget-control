@@ -13,8 +13,6 @@ public static class ApplicationServiceExtension
         services.AddMediatR(configuration =>
             configuration.RegisterServicesFromAssembly(assembly));
 
-        services.AddAutoMapper(assembly);
-
         return services;
     }
 }

@@ -2,6 +2,10 @@
 
 public abstract class Entity : ICloneable
 {
+    public bool IsDeleted { get; protected set; }
+
+    public void Delete() => this.IsDeleted = true;
+
     public override bool Equals(object? obj)
     {
         if (obj is null) return false;
@@ -17,5 +21,5 @@ public abstract class Entity : ICloneable
 
     public object Clone() => MemberwiseClone();
 
-    public override int GetHashCode() => base.GetHashCode();
+    public override int GetHashCode() => HashCode.Combine(IsDeleted);
 }
